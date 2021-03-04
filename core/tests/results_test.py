@@ -637,8 +637,7 @@ class TestCaseResultsXML:
     def test_remember_match_percentage(self):
         group = self.groups[0]
         d1, d2, d3 = group
-        fake_matches = set()
-        fake_matches.add(engine.Match(d1, d2, 42))
+        fake_matches = {engine.Match(d1, d2, 42)}
         fake_matches.add(engine.Match(d1, d3, 43))
         fake_matches.add(engine.Match(d2, d3, 46))
         group.matches = fake_matches

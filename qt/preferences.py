@@ -91,7 +91,7 @@ class Preferences(PreferencesBase):
         self.debug_mode = False
         self.destination_type = 1
         self.custom_command = ""
-        self.language = trans.installed_lang if trans.installed_lang else ""
+        self.language = trans.installed_lang or ""
 
         self.tableFontSize = QApplication.font().pointSize()
         self.reference_bold_font = True
@@ -99,7 +99,7 @@ class Preferences(PreferencesBase):
         self.details_dialog_vertical_titlebar = True
         self.details_table_delta_foreground_color = QColor(250, 20, 20)  # red
         # By default use internal icons on platforms other than Linux for now
-        self.details_dialog_override_theme_icons = False if not ISLINUX else True
+        self.details_dialog_override_theme_icons = bool(ISLINUX)
         self.details_dialog_viewers_show_scrollbars = True
         self.result_table_ref_foreground_color = QColor(Qt.blue)
         self.result_table_ref_background_color = QColor(Qt.darkGray)

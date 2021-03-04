@@ -230,14 +230,14 @@ class TestCaseavgdiff:
         eq_(expected, my_avgdiff(blocks1, blocks2))
 
     def test_blocks_not_the_same_size(self):
-        b = (0, 0, 0)
         with raises(DifferentBlockCountError):
+            b = (0, 0, 0)
             my_avgdiff([b, b], [b])
 
     def test_first_arg_is_empty_but_not_second(self):
-        # Don't return 0 (as when the 2 lists are empty), raise!
-        b = (0, 0, 0)
         with raises(DifferentBlockCountError):
+            # Don't return 0 (as when the 2 lists are empty), raise!
+            b = (0, 0, 0)
             my_avgdiff([], [b])
 
     def test_limit(self):

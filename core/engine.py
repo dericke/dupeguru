@@ -156,16 +156,19 @@ def reduce_common_words(word_dict, threshold):
     The exception to this removal are the objects where all the words of the object are common.
     Because if we remove them, we will miss some duplicates!
     """
-    uncommon_words = set(
+    uncommon_words = {
         word for word, objects in word_dict.items() if len(objects) < threshold
-    )
+    }
+
     for word, objects in list(word_dict.items()):
         if len(objects) < threshold:
             continue
-        reduced = set()
-        for o in objects:
-            if not any(w in uncommon_words for w in unpack_fields(o.words)):
-                reduced.add(o)
+        reduced = {
+            o
+            for o in objects
+            if all(w not in uncommon_words for w in unpack_fields(o.words))
+        }
+
         if reduced:
             word_dict[word] = reduced
         else:
@@ -290,9 +293,11 @@ def getmatches_by_contents(files, j=job.nulljob):
         for first, second in itertools.combinations(group, 2):
             if first.is_ref and second.is_ref:
                 continue  # Don't spend time comparing two ref pics together.
-            if first.md5partial == second.md5partial:
-                if first.md5 == second.md5:
-                    result.append(Match(first, second, 100))
+            if (
+                first.md5partial == second.md5partial
+                and first.md5 == second.md5
+            ):
+                result.append(Match(first, second, 100))
         j.add_progress(desc=tr("%d matches found") % len(result))
     return result
 
@@ -391,11 +396,12 @@ class Group:
 
         You can call this after the duplicate scanning process to free a bit of memory.
         """
-        discarded = set(
+        discarded = {
             m
             for m in self.matches
-            if not all(obj in self.unordered for obj in [m.first, m.second])
-        )
+            if any(obj not in self.unordered for obj in [m.first, m.second])
+        }
+
         self.matches -= discarded
         self.candidates = defaultdict(set)
         return discarded
@@ -446,7 +452,7 @@ class Group:
                 not getattr(item, "is_ref", False) for item in self
             ):
                 if discard_matches:
-                    self.matches = set(m for m in self.matches if item not in m)
+                    self.matches = {m for m in self.matches if item not in m}
             else:
                 self._clear()
         except ValueError:
@@ -532,8 +538,9 @@ def get_groups(matches):
         orphan_matches += {
             m
             for m in group.discard_matches()
-            if not any(obj in matched_files for obj in [m.first, m.second])
+            if all(obj not in matched_files for obj in [m.first, m.second])
         }
+
     if groups and orphan_matches:
         groups += get_groups(
             orphan_matches

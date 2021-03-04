@@ -259,10 +259,7 @@ def format_size(size, decimal=0, forcepower=-1, showdesc=True):
             i += 1
     else:
         i = forcepower
-    if i > 0:
-        div = SIZE_VALS[i - 1]
-    else:
-        div = 1
+    div = SIZE_VALS[i - 1] if i > 0 else 1
     format = "%%%d.%df" % (decimal, decimal)
     negative = size < 0
     divided_size = (0.0 + abs(size)) / div

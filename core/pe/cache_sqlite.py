@@ -40,11 +40,11 @@ class SqliteCache:
         else:
             sql = "select blocks from pictures where path = ?"
         result = self.con.execute(sql, [key]).fetchone()
-        if result:
-            result = string_to_colors(result[0])
-            return result
-        else:
+        if not result:
             raise KeyError(key)
+
+        result = string_to_colors(result[0])
+        return result
 
     def __iter__(self):
         sql = "select path from pictures"
@@ -58,10 +58,7 @@ class SqliteCache:
 
     def __setitem__(self, path_str, blocks):
         blocks = colors_to_string(blocks)
-        if op.exists(path_str):
-            mtime = int(os.stat(path_str).st_mtime)
-        else:
-            mtime = 0
+        mtime = int(os.stat(path_str).st_mtime) if op.exists(path_str) else 0
         if path_str in self:
             sql = "update pictures set blocks = ?, mtime = ? where path = ?"
         else:

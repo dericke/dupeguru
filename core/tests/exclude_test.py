@@ -203,10 +203,7 @@ class TestCaseListEmpty:
         # Only default regexes marked and in compiled list
         for re in default_regexes:
             assert self.exclude_list.is_marked(re)
-            found = False
-            for compiled_re in compiled:
-                if compiled_re.pattern == re:
-                    found = True
+            found = any(compiled_re.pattern == re for compiled_re in compiled)
             if not found:
                 raise(Exception(f"Default RE {re} not found in compiled list."))
             continue
@@ -247,10 +244,7 @@ class TestCaseCompiledList():
 
     def test_compiled_files(self):
         # is path separator checked properly to yield the output
-        if ISWINDOWS:
-            regex1 = r"test\\one\\sub"
-        else:
-            regex1 = r"test/one/sub"
+        regex1 = r"test\\one\\sub" if ISWINDOWS else r"test/one/sub"
         self.e_separate.add(regex1)
         self.e_separate.mark(regex1)
         self.e_union.add(regex1)

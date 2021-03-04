@@ -126,17 +126,10 @@ class Rect:
     def intersects(self, other):
         r1pt1, r1pt2 = self.corners()
         r2pt1, r2pt2 = other.corners()
-        if r1pt1.x < r2pt1.x:
-            xinter = r1pt2.x >= r2pt1.x
-        else:
-            xinter = r2pt2.x >= r1pt1.x
+        xinter = r1pt2.x >= r2pt1.x if r1pt1.x < r2pt1.x else r2pt2.x >= r1pt1.x
         if not xinter:
             return False
-        if r1pt1.y < r2pt1.y:
-            yinter = r1pt2.y >= r2pt1.y
-        else:
-            yinter = r2pt2.y >= r1pt1.y
-        return yinter
+        return r1pt2.y >= r2pt1.y if r1pt1.y < r2pt1.y else r2pt2.y >= r1pt1.y
 
     def lines(self):
         pt1, pt4 = self.corners()

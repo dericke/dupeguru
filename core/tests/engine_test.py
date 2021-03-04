@@ -284,9 +284,10 @@ class TestCasemerge_similar_words:
 class TestCasereduce_common_words:
     def test_typical(self):
         d = {
-            "foo": set([NamedObject("foo bar", True) for i in range(50)]),
-            "bar": set([NamedObject("foo bar", True) for i in range(49)]),
+            "foo": {NamedObject("foo bar", True) for i in range(50)},
+            "bar": {NamedObject("foo bar", True) for i in range(49)},
         }
+
         reduce_common_words(d, 50)
         assert "foo" not in d
         eq_(49, len(d["bar"]))
@@ -319,10 +320,11 @@ class TestCasereduce_common_words:
         # If a word has been removed by the reduce, an object in a subsequent common word that
         # contains the word that has been removed would cause a KeyError.
         d = {
-            "foo": set([NamedObject("foo bar baz", True) for i in range(50)]),
-            "bar": set([NamedObject("foo bar baz", True) for i in range(50)]),
-            "baz": set([NamedObject("foo bar baz", True) for i in range(49)]),
+            "foo": {NamedObject("foo bar baz", True) for i in range(50)},
+            "bar": {NamedObject("foo bar baz", True) for i in range(50)},
+            "baz": {NamedObject("foo bar baz", True) for i in range(49)},
         }
+
         try:
             reduce_common_words(d, 50)
         except KeyError:
@@ -347,15 +349,11 @@ class TestCasereduce_common_words:
         # as a common word, keeping a "foo bar" file in it, and the 'bar' is processed, "foo bar"
         # would not stay in 'bar' because 'foo' is not a common word anymore.
         only_common = NamedObject("foo bar", True)
-        d = {
-            "foo": set(
+        d = {"foo": set(
                 [NamedObject("foo bar baz", True) for i in range(49)] + [only_common]
-            ),
-            "bar": set(
+            ), "bar": set(
                 [NamedObject("foo bar baz", True) for i in range(49)] + [only_common]
-            ),
-            "baz": set([NamedObject("foo bar baz", True) for i in range(49)]),
-        }
+            ), "baz": {NamedObject("foo bar baz", True) for i in range(49)}}
         reduce_common_words(d, 50)
         eq_(1, len(d["foo"]))
         eq_(1, len(d["bar"]))

@@ -119,13 +119,14 @@ def get_chunks(pictures):
         chunk_size,
         len(pictures),
     )
-    chunks = [pictures[i : i + chunk_size] for i in range(0, len(pictures), chunk_size)]
-    return chunks
+    return [
+        pictures[i : i + chunk_size]
+        for i in range(0, len(pictures), chunk_size)
+    ]
 
 
 def get_match(first, second, percentage):
-    if percentage < 0:
-        percentage = 0
+    percentage = max(percentage, 0)
     return Match(first, second, percentage)
 
 

@@ -102,7 +102,7 @@ def test_old_compare_paths(force_ossep):
     eq_(Path("/foo/bar"), Path("\\foo\\bar\\", "\\"))
     assert Path("/foo/bar") != Path("\\foo\\foo", "\\")
     # We also have to test __ne__
-    assert not (Path("foobar") != Path("foobar"))
+    assert Path("foobar") == Path("foobar")
     assert Path("/a/b/c.x") != Path("/a/b/c.y")
 
 

@@ -84,32 +84,33 @@ class Scanner:
             j = j.start_subjob([2, 8])
             for f in j.iter_with_progress(files, tr("Read size of %d/%d files")):
                 f.size  # pre-read, makes a smoother progress if read here (especially for bundles)
-            if self.size_threshold:
-                files = [f for f in files if f.size >= self.size_threshold]
+        if self.size_threshold:
+            files = [f for f in files if f.size >= self.size_threshold]
         if self.scan_type in {ScanType.Contents, ScanType.Folders}:
             return engine.getmatches_by_contents(files, j=j)
-        else:
-            j = j.start_subjob([2, 8])
-            kw = {}
-            kw["match_similar_words"] = self.match_similar_words
-            kw["weight_words"] = self.word_weighting
-            kw["min_match_percentage"] = self.min_match_percentage
-            if self.scan_type == ScanType.FieldsNoOrder:
-                self.scan_type = ScanType.Fields
-                kw["no_field_order"] = True
-            func = {
-                ScanType.Filename: lambda f: engine.getwords(rem_file_ext(f.name)),
-                ScanType.Fields: lambda f: engine.getfields(rem_file_ext(f.name)),
-                ScanType.Tag: lambda f: [
-                    engine.getwords(str(getattr(f, attrname)))
-                    for attrname in SCANNABLE_TAGS
-                    if attrname in self.scanned_tags
-                ],
-            }[self.scan_type]
-            for f in j.iter_with_progress(files, tr("Read metadata of %d/%d files")):
-                logging.debug("Reading metadata of %s", f.path)
-                f.words = func(f)
-            return engine.getmatches(files, j=j, **kw)
+        j = j.start_subjob([2, 8])
+        kw = {
+            "match_similar_words": self.match_similar_words,
+            "weight_words": self.word_weighting,
+            "min_match_percentage": self.min_match_percentage,
+        }
+
+        if self.scan_type == ScanType.FieldsNoOrder:
+            self.scan_type = ScanType.Fields
+            kw["no_field_order"] = True
+        func = {
+            ScanType.Filename: lambda f: engine.getwords(rem_file_ext(f.name)),
+            ScanType.Fields: lambda f: engine.getfields(rem_file_ext(f.name)),
+            ScanType.Tag: lambda f: [
+                engine.getwords(str(getattr(f, attrname)))
+                for attrname in SCANNABLE_TAGS
+                if attrname in self.scanned_tags
+            ],
+        }[self.scan_type]
+        for f in j.iter_with_progress(files, tr("Read metadata of %d/%d files")):
+            logging.debug("Reading metadata of %s", f.path)
+            f.words = func(f)
+        return engine.getmatches(files, j=j, **kw)
 
     @staticmethod
     def _key_func(dupe):

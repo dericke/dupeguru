@@ -70,12 +70,12 @@ def createQSettings():
     # Create a QSettings instance with the correct arguments.
     # On windows use an ini file in the AppDataLocation instead of registry if possible as it
     # makes it easier for a user to clear it out when there are issues.
-    if ISWINDOWS:
-        Locations = QStandardPaths.standardLocations(QStandardPaths.AppDataLocation)
-        if Locations:
-            return QSettings(op.join(Locations[0], "settings.ini"), QSettings.IniFormat)
-        else:
-            return QSettings()
+    if not ISWINDOWS:
+        return QSettings()
+
+    Locations = QStandardPaths.standardLocations(QStandardPaths.AppDataLocation)
+    if Locations:
+        return QSettings(op.join(Locations[0], "settings.ini"), QSettings.IniFormat)
     else:
         return QSettings()
 

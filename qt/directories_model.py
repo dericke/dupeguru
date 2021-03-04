@@ -132,9 +132,12 @@ class DirectoriesModel(TreeModel):
         return result
 
     def headerData(self, section, orientation, role):
-        if orientation == Qt.Horizontal:
-            if role == Qt.DisplayRole and section < len(HEADERS):
-                return HEADERS[section]
+        if (
+            orientation == Qt.Horizontal
+            and role == Qt.DisplayRole
+            and section < len(HEADERS)
+        ):
+            return HEADERS[section]
         return None
 
     def mimeTypes(self):

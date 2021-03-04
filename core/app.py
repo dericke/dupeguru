@@ -188,17 +188,18 @@ class DupeGuru(Broadcaster):
         return op.join(self.appdata, cache_name)
 
     def _get_dupe_sort_key(self, dupe, get_group, key, delta):
-        if self.app_mode in (AppMode.Music, AppMode.Picture):
-            if key == "folder_path":
-                dupe_folder_path = getattr(
-                    dupe, "display_folder_path", dupe.folder_path
-                )
-                return str(dupe_folder_path).lower()
-        if self.app_mode == AppMode.Picture:
-            if delta and key == "dimensions":
-                r = cmp_value(dupe, key)
-                ref_value = cmp_value(get_group().ref, key)
-                return get_delta_dimensions(r, ref_value)
+        if (
+            self.app_mode in (AppMode.Music, AppMode.Picture)
+            and key == "folder_path"
+        ):
+            dupe_folder_path = getattr(
+                dupe, "display_folder_path", dupe.folder_path
+            )
+            return str(dupe_folder_path).lower()
+        if self.app_mode == AppMode.Picture and delta and key == "dimensions":
+            r = cmp_value(dupe, key)
+            ref_value = cmp_value(get_group().ref, key)
+            return get_delta_dimensions(r, ref_value)
         if key == "marked":
             return self.results.is_marked(dupe)
         if key == "percentage":
@@ -218,12 +219,14 @@ class DupeGuru(Broadcaster):
         return result
 
     def _get_group_sort_key(self, group, key):
-        if self.app_mode in (AppMode.Music, AppMode.Picture):
-            if key == "folder_path":
-                dupe_folder_path = getattr(
-                    group.ref, "display_folder_path", group.ref.folder_path
-                )
-                return str(dupe_folder_path).lower()
+        if (
+            self.app_mode in (AppMode.Music, AppMode.Picture)
+            and key == "folder_path"
+        ):
+            dupe_folder_path = getattr(
+                group.ref, "display_folder_path", group.ref.folder_path
+            )
+            return str(dupe_folder_path).lower()
         if key == "percentage":
             return group.percentage
         if key == "dupe_count":
@@ -339,12 +342,12 @@ class DupeGuru(Broadcaster):
                 self.view.show_message(msg)
 
     def _job_error(self, jobid, err):
-        if jobid == JobType.Load:
-            msg = tr("Could not load file: {}").format(err)
-            self.view.show_message(msg)
-            return False
-        else:
+        if jobid != JobType.Load:
             raise err
+
+        msg = tr("Could not load file: {}").format(err)
+        self.view.show_message(msg)
+        return False
 
     @staticmethod
     def _remove_hardlink_dupes(files):
@@ -623,9 +626,8 @@ class DupeGuru(Broadcaster):
         changed_groups = set()
         for dupe in dupes:
             g = self.results.get_group_of_duplicate(dupe)
-            if g not in changed_groups:
-                if self.results.make_ref(dupe):
-                    changed_groups.add(g)
+            if g not in changed_groups and self.results.make_ref(dupe):
+                changed_groups.add(g)
         # It's not always obvious to users what this action does, so to make it a bit clearer,
         # we change our selection to the ref of all changed groups. However, we also want to keep
         # the files that were ref before and weren't changed by the action. In effect, what this
@@ -681,9 +683,10 @@ class DupeGuru(Broadcaster):
     def open_selected(self):
         """Open :attr:`selected_dupes` with their associated application.
         """
-        if len(self.selected_dupes) > 10:
-            if not self.view.ask_yes_no(MSG_MANY_FILES_TO_OPEN):
-                return
+        if len(self.selected_dupes) > 10 and not self.view.ask_yes_no(
+            MSG_MANY_FILES_TO_OPEN
+        ):
+            return
         for dupe in self.selected_dupes:
             desktop.open_path(dupe.path)
 
@@ -766,10 +769,12 @@ class DupeGuru(Broadcaster):
         :param sort_key: The key being sent to :meth:`~core.engine.Group.prioritize`
         :type sort_key: f(dupe)
         """
-        count = 0
-        for group in self.results.groups:
-            if group.prioritize(key_func=sort_key):
-                count += 1
+        count = sum(
+            1
+            for group in self.results.groups
+            if group.prioritize(key_func=sort_key)
+        )
+
         self._results_changed()
         msg = tr("{} duplicate groups were changed by the re-prioritization.").format(
             count

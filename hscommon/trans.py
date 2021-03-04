@@ -134,9 +134,8 @@ def install_gettext_trans(base_folder, lang):
     def gettext_tr(s, context=None):
         if not context:
             return default_gettext(s)
-        else:
-            trfunc = gettext_trget(context)
-            return trfunc(s)
+        trfunc = gettext_trget(context)
+        return trfunc(s)
 
     set_tr(gettext_tr, gettext_trget)
     global installed_lang

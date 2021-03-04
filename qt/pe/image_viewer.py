@@ -187,13 +187,12 @@ class BaseController(QObject):
             self.referencePixmap = QPixmap()
             self.scaledReferencePixmap = QPixmap()
             self.parent.verticalToolBar.buttonImgSwap.setEnabled(False)
-            self.parent.verticalToolBar.buttonNormalSize.setEnabled(True)
         else:
             self.referencePixmap = QPixmap(str(ref.path))
             self.parent.verticalToolBar.buttonImgSwap.setEnabled(True)
             if ref.dimensions != dupe.dimensions:
                 self.same_dimensions = False
-            self.parent.verticalToolBar.buttonNormalSize.setEnabled(True)
+        self.parent.verticalToolBar.buttonNormalSize.setEnabled(True)
         self.updateButtonsAsPerDimensions(previous_same_dimensions)
         self.updateBothImages(same_group)
         self.centerViews(same_group and self.referencePixmap.isNull())
@@ -607,13 +606,12 @@ class GraphicsViewController(BaseController):
             self.same_dimensions = False
             self.referencePixmap = QPixmap()
             self.parent.verticalToolBar.buttonImgSwap.setEnabled(False)
-            self.parent.verticalToolBar.buttonNormalSize.setEnabled(True)
         else:
             self.referencePixmap = QPixmap(str(ref.path))
             self.parent.verticalToolBar.buttonImgSwap.setEnabled(True)
             if ref.dimensions != dupe.dimensions:
                 self.same_dimensions = False
-            self.parent.verticalToolBar.buttonNormalSize.setEnabled(True)
+        self.parent.verticalToolBar.buttonNormalSize.setEnabled(True)
         # self.selectedViewer.setImage(self.selectedPixmap)
         # self.referenceViewer.setImage(self.referencePixmap)
         self.updateButtonsAsPerDimensions(previous_same_dimensions)
@@ -833,7 +831,7 @@ class QWidgetImageViewer(QWidget):
         self.update()
 
     def shouldBeActive(self):
-        return True if not self.pixmap.isNull() else False
+        return not self.pixmap.isNull()
 
     def scaleBy(self, factor):
         self.current_scale *= factor
@@ -1044,7 +1042,7 @@ class ScrollAreaImageViewer(QScrollArea):
         self.label.update()
 
     def shouldBeActive(self):
-        return True if not self.pixmap.isNull() else False
+        return not self.pixmap.isNull()
 
     def scaleBy(self, factor):
         self.current_scale *= factor

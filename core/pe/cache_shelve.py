@@ -54,10 +54,7 @@ class ShelveCache:
         del self.shelve[wrap_id(row.id)]
 
     def __getitem__(self, key):
-        if isinstance(key, int):
-            skey = self.shelve[wrap_id(key)]
-        else:
-            skey = wrap_path(key)
+        skey = self.shelve[wrap_id(key)] if isinstance(key, int) else wrap_path(key)
         return string_to_colors(self.shelve[skey].blocks)
 
     def __iter__(self):
@@ -68,10 +65,7 @@ class ShelveCache:
 
     def __setitem__(self, path_str, blocks):
         blocks = colors_to_string(blocks)
-        if op.exists(path_str):
-            mtime = int(os.stat(path_str).st_mtime)
-        else:
-            mtime = 0
+        mtime = int(os.stat(path_str).st_mtime) if op.exists(path_str) else 0
         if path_str in self:
             rowid = self.shelve[wrap_path(path_str)].id
         else:
