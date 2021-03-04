@@ -154,10 +154,7 @@ def package_windows():
     version_array = match.group(0).split(".")
     match = re.search("[0-9]+", arch)
     bits = match.group(0)
-    if bits == "64":
-        arch = "x64"
-    else:
-        arch = "x86"
+    arch = "x64" if bits == "64" else "x86"
     # include locale files if they are built otherwise exit as it will break
     # the localization
     if not op.exists("build/locale"):
@@ -169,16 +166,14 @@ def package_windows():
         return
     # create version information file from template
     try:
-        version_template = open("win_version_info.temp", "r")
-        version_info = version_template.read()
-        version_template.close()
-        version_info_file = open("win_version_info.txt", "w")
-        version_info_file.write(
-            version_info.format(
-                version_array[0], version_array[1], version_array[2], bits
+        with open("win_version_info.temp", "r") as version_template:
+            version_info = version_template.read()
+        with open("win_version_info.txt", "w") as version_info_file:
+            version_info_file.write(
+                version_info.format(
+                    version_array[0], version_array[1], version_array[2], bits
+                )
             )
-        )
-        version_info_file.close()
     except Exception:
         print("Error creating version info file, exiting...")
         return
@@ -245,15 +240,12 @@ def main():
         package_source_txz()
         return
     print("Packaging dupeGuru with UI qt")
-    if sys.platform == "win32":
-        package_windows()
-    elif sys.platform == "darwin":
+    if sys.platform == "darwin":
         package_macos()
+    elif sys.platform == "win32":
+        package_windows()
     else:
-        if not args.arch_pkg:
-            distname = distro.id()
-        else:
-            distname = "arch"
+        distname = distro.id() if not args.arch_pkg else "arch"
         if distname == "arch":
             package_arch()
         else:

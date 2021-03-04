@@ -19,10 +19,7 @@ from ..me.scanner import ScannerME
 
 class NamedObject:
     def __init__(self, name="foobar", size=1, path=None):
-        if path is None:
-            path = Path(name)
-        else:
-            path = Path(path)[name]
+        path = Path(name) if path is None else Path(path)[name]
         self.name = name
         self.size = size
         self.path = path

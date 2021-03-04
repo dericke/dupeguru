@@ -106,10 +106,7 @@ class SelectableList(MutableSequence, Selectable):
 
     def __init__(self, items=None):
         Selectable.__init__(self)
-        if items:
-            self._items = list(items)
-        else:
-            self._items = []
+        self._items = list(items) if items else []
 
     def __delitem__(self, key):
         self._items.__delitem__(key)

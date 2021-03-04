@@ -172,8 +172,8 @@ def s2n_intel(bytes):
     x = 0
     y = 0
     for c in bytes:
-        x = x | (c << y)
-        y = y + 8
+        x |= c << y
+        y += 8
     return x
 
 
@@ -253,7 +253,7 @@ class TIFF_file:
             else:
                 values = []
                 signed = type == 6 or type >= 8
-                for j in range(count):
+                for _ in range(count):
                     if type in {5, 10}:
                         # The type is either 5 or 10
                         value_j = Fraction(

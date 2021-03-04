@@ -172,7 +172,7 @@ class ResultTable(GUITable, DupeGuruGUIObject):
 
     @property
     def selected_dupe_count(self):
-        return sum(1 for row in self.selected_rows if not row.isref)
+        return sum(not row.isref for row in self.selected_rows)
 
     # --- Event Handlers
     def marking_changed(self):

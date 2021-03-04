@@ -138,13 +138,16 @@ class TabWindow(QMainWindow):
             False if page_type == "ResultWindow"
             else self.app.resultWindow is not None)
         self.app.actionIgnoreList.setEnabled(
-            True if self.app.ignoreListDialog is not None
-            and not page_type == "IgnoreListDialog" else False)
-        self.app.actionDirectoriesWindow.setEnabled(
-            False if page_type == "DirectoriesDialog" else True)
+            self.app.ignoreListDialog is not None
+            and page_type != "IgnoreListDialog"
+        )
+
+        self.app.actionDirectoriesWindow.setEnabled(page_type != "DirectoriesDialog")
         self.app.actionExcludeList.setEnabled(
-            True if self.app.excludeListDialog is not None
-            and not page_type == "ExcludeListDialog" else False)
+            self.app.excludeListDialog is not None
+            and page_type != "ExcludeListDialog"
+        )
+
 
         self.previous_widget_actions = active_widget.specific_actions
         self.last_index = current_index

@@ -70,9 +70,7 @@ class Results(Markable):
             return False
         if dupe is g.ref:
             return False
-        if self.__filtered_dupes and dupe not in self.__filtered_dupes:
-            return False
-        return True
+        return not self.__filtered_dupes or dupe in self.__filtered_dupes
 
     def mark_all(self):
         if self.__filters:
@@ -199,14 +197,12 @@ class Results(Markable):
             self.__filters.append(filter_str)
             if self.__filtered_dupes is None:
                 self.__filtered_dupes = flatten(g[:] for g in self.groups)
-            self.__filtered_dupes = set(
-                dupe
-                for dupe in self.__filtered_dupes
-                if filter_re.search(str(dupe.path))
-            )
-            filtered_groups = set()
-            for dupe in self.__filtered_dupes:
-                filtered_groups.add(self.get_group_of_duplicate(dupe))
+            self.__filtered_dupes = {dupe for dupe in self.__filtered_dupes
+                        if filter_re.search(str(dupe.path))}
+            filtered_groups = {
+                self.get_group_of_duplicate(dupe) for dupe in self.__filtered_dupes
+            }
+
             self.__filtered_groups = list(filtered_groups)
         self.__recalculate_stats()
         sd = self.__groups_sort_descriptor

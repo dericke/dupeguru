@@ -123,9 +123,8 @@ class TestCaseSqliteCache(BaseTestCaseCache):
         # go, a dirty monkeypatch.
         monkeypatch.setattr(logging, "warning", lambda *args, **kw: None)
         dbname = str(tmpdir.join("foo.db"))
-        fp = open(dbname, "w")
-        fp.write("invalid sqlite content")
-        fp.close()
+        with open(dbname, "w") as fp:
+            fp.write("invalid sqlite content")
         c = self.get_cache(dbname)  # should not raise a DatabaseError
         c["foo"] = [(1, 2, 3)]
         del c

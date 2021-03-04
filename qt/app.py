@@ -285,9 +285,7 @@ class DupeGuru(QObject):
                 "you set your system locale properly."
             )
             QMessageBox.warning(
-                self.main_window if self.main_window else self.directories_dialog,
-                "Wrong Locale",
-                msg,
+                self.main_window or self.directories_dialog, "Wrong Locale", msg
             )
 
     def clearPictureCacheTriggered(self):
@@ -327,8 +325,9 @@ class DupeGuru(QObject):
 
     def preferencesTriggered(self):
         preferences_dialog = self._get_preferences_dialog_class()(
-            self.main_window if self.main_window else self.directories_dialog, self
+            self.main_window or self.directories_dialog, self
         )
+
         preferences_dialog.load()
         result = preferences_dialog.exec()
         if result == QDialog.Accepted:

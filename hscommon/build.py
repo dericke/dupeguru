@@ -103,15 +103,13 @@ def filereplace(filename, outfilename=None, **kwargs):
     """
     if outfilename is None:
         outfilename = filename
-    fp = open(filename, "rt", encoding="utf-8")
-    contents = fp.read()
-    fp.close()
+    with open(filename, "rt", encoding="utf-8") as fp:
+        contents = fp.read()
     # We can't use str.format() because in some files, there might be {} characters that mess with it.
     for key, item in kwargs.items():
         contents = contents.replace("{{{}}}".format(key), item)
-    fp = open(outfilename, "wt", encoding="utf-8")
-    fp.write(contents)
-    fp.close()
+    with open(outfilename, "wt", encoding="utf-8") as fp:
+        fp.write(contents)
 
 
 def get_module_version(modulename):
@@ -493,13 +491,11 @@ def collect_stdlib_dependencies(script, dest_folder, extra_deps=None):
             return False
         if "site-package" in path:
             return False
-        if not (
+        return bool((
             path.startswith(sysprefix)
             or path.startswith(basesysprefix)
             or path.startswith(real_lib_prefix)
-        ):
-            return False
-        return True
+        ))
 
     ensure_folder(dest_folder)
     mf = modulefinder.ModuleFinder()

@@ -57,7 +57,7 @@ class PreferencesDialog(PreferencesDialogBase):
         self.details_dialog_override_theme_icons.setToolTip(
             tr("Use our own internal icons instead of those provided by the theme engine"))
         # Prevent changing this on platforms where themes are unpredictable
-        self.details_dialog_override_theme_icons.setEnabled(False if not ISLINUX else True)
+        self.details_dialog_override_theme_icons.setEnabled(bool(ISLINUX))
         # Insert this right after the vertical title bar option
         index = self.details_groupbox_layout.indexOf(self.details_dialog_vertical_titlebar)
         self.details_groupbox_layout.insertWidget(

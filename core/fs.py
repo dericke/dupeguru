@@ -102,8 +102,8 @@ class File:
                     "An error '%s' was raised while decoding '%s'", e, repr(self.path)
                 )
             result = object.__getattribute__(self, attrname)
-            if result is NOT_SET:
-                result = self.INITIAL_INFO[attrname]
+        if result is NOT_SET:
+            result = self.INITIAL_INFO[attrname]
         return result
 
     # This offset is where we should start reading the file to get a partial md5

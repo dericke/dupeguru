@@ -132,10 +132,7 @@ def strings2pot(target, dest):
     # We're reading an en.lproj file. We only care about the righthand part of the translation.
     re_trans = re.compile(r'".*" = "(.*)";')
     strings = re_trans.findall(contents)
-    if op.exists(dest):
-        po = polib.pofile(dest)
-    else:
-        po = polib.POFile()
+    po = polib.pofile(dest) if op.exists(dest) else polib.POFile()
     for s in dedupe(strings):
         s = unescape_cocoa_strings(s)
         entry = po.find(s)

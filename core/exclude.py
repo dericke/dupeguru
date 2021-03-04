@@ -215,7 +215,7 @@ class ExcludeList(Markable):
         The interface should be expected to be a generator, even if it returns only
         one item (one Pattern in the union case)."""
         if self._dirty:
-            self.build_compiled_caches(True if self._use_union else False)
+            self.build_compiled_caches(bool(self._use_union))
             self._dirty = False
         return self._cached_compiled_union_files if self._use_union\
             else self._cached_compiled_files
@@ -224,7 +224,7 @@ class ExcludeList(Markable):
     def compiled_paths(self):
         """Returns patterns with only separators in them, for more precise filtering."""
         if self._dirty:
-            self.build_compiled_caches(True if self._use_union else False)
+            self.build_compiled_caches(bool(self._use_union))
             self._dirty = False
         return self._cached_compiled_union_paths if self._use_union\
             else self._cached_compiled_paths
@@ -257,10 +257,7 @@ class ExcludeList(Markable):
         return len([x for marked, x in self if marked])
 
     def isExcluded(self, regex):
-        for item in self._excluded:
-            if regex == item[0]:
-                return True
-        return False
+        return any(regex == item[0] for item in self._excluded)
 
     def remove(self, regex):
         for item in self._excluded:
@@ -426,9 +423,7 @@ class ExcludeDict(ExcludeList):
         }
 
     def isExcluded(self, regex):
-        if regex in self._excluded.keys():
-            return True
-        return False
+        return regex in self._excluded.keys()
 
     def remove(self, regex):
         old_value = self._excluded.pop(regex)
@@ -467,9 +462,7 @@ class ExcludeDict(ExcludeList):
         """
         root = ET.Element("exclude_list")
         # reversed in order to keep order of entries when reloading from xml later
-        reversed_list = []
-        for key in ordered_keys(self._excluded):
-            reversed_list.append(key)
+        reversed_list = [key for key in ordered_keys(self._excluded)]
         for item in reversed(reversed_list):
             exclude_node = ET.SubElement(root, "exclude")
             exclude_node.set("regex", str(item))
@@ -483,9 +476,7 @@ def ordered_keys(_dict):
     """Returns an iterator over the keys of dictionary sorted by "index" key"""
     if not len(_dict):
         return
-    list_of_items = []
-    for item in _dict.items():
-        list_of_items.append(item)
+    list_of_items = [item for item in _dict.items()]
     list_of_items.sort(key=lambda x: x[1].get("index"))
     for item in list_of_items:
         yield item[0]

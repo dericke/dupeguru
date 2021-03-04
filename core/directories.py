@@ -61,10 +61,7 @@ class Directories:
         self._exclude_list = exclude_list
 
     def __contains__(self, path):
-        for p in self._dirs:
-            if path in p:
-                return True
-        return False
+        return any(path in p for p in self._dirs)
 
     def __delitem__(self, key):
         self._dirs.__delitem__(key)
@@ -144,8 +141,7 @@ class Directories:
         j.check_if_cancelled()
         try:
             for subfolder in from_folder.subfolders:
-                for folder in self._get_folders(subfolder, j):
-                    yield folder
+                yield from self._get_folders(subfolder, j)
             state = self.get_state(from_folder.path)
             if state != DirectoryState.Excluded:
                 from_folder.is_ref = state == DirectoryState.Reference
@@ -194,8 +190,7 @@ class Directories:
         if fileclasses is None:
             fileclasses = [fs.File]
         for path in self._dirs:
-            for file in self._get_files(path, fileclasses=fileclasses, j=j):
-                yield file
+            yield from self._get_files(path, fileclasses=fileclasses, j=j)
 
     def get_folders(self, folderclass=None, j=job.nulljob):
         """Returns a list of all folders that are not excluded.
@@ -206,8 +201,7 @@ class Directories:
             folderclass = fs.Folder
         for path in self._dirs:
             from_folder = folderclass(path)
-            for folder in self._get_folders(from_folder, j):
-                yield folder
+            yield from self._get_folders(from_folder, j)
 
     def get_state(self, path):
         """Returns the state of ``path``.

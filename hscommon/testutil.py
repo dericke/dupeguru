@@ -220,7 +220,7 @@ def _unify_args(func, args, kwargs, args_to_ignore=None):
         arg_names = list(func.__code__.co_varnames)
         if len(args) < arg_count:  # We have default values
             required_arg_count = arg_count - len(args)
-            args = args + defaults[-required_arg_count:]
+            args += defaults[-required_arg_count:]
         for arg_name, arg in zip(arg_names, args):
             # setdefault is used because if the arg is already in kwargs, we don't want to use default values
             result.setdefault(arg_name, arg)

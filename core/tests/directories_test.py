@@ -314,7 +314,7 @@ def test_get_state_returns_excluded_by_default_for_hidden_directories(tmpdir):
     d = Directories()
     p = Path(str(tmpdir))
     hidden_dir_path = p[".foo"]
-    p[".foo"].mkdir()
+    hidden_dir_path.mkdir()
     d.add_path(p)
     eq_(d.get_state(hidden_dir_path), DirectoryState.Excluded)
     # But it can be overriden
